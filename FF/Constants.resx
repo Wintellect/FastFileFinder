@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ArrayMustBeValid" xml:space="preserve">
+    <value>The array must not be null or of zero length.</value>
+  </data>
+  <data name="ErrorSwitch" xml:space="preserve">
+    <value>Error on the '{0}' switch.</value>
+  </data>
+  <data name="InvalidParameter" xml:space="preserve">
+    <value>An invalid parameter was passed to the method</value>
+  </data>
+  <data name="NoPatternsSpecified" xml:space="preserve">
+    <value>No search patterns were specified.</value>
+  </data>
+  <data name="PathMultipleSwitches" xml:space="preserve">
+    <value>Only one -path switch at a time may be used.</value>
+  </data>
+  <data name="PathNotExist" xml:space="preserve">
+    <value>The path directory does not exist.</value>
+  </data>
+  <data name="UnknownCommandLineOption" xml:space="preserve">
+    <value>Unknown command line option.</value>
+  </data>
+  <data name="UsageString" xml:space="preserve">
+    <value>FF {0}
+(c) 2012, John Robbins/Wintellect - john@wintellect.com
+Find file and directory names fast!
+
+Usage: 
+FF [-regex] [-includedir] [-nostats] [-path &lt;directory&gt;] pattern*
+
+-regex            - Treat the patterns as regular expressions. The default 
+                    follows DOS wildcard usage. Make sure to use regex values 
+                    in patterns with this flag. (short: -re)
+-includedir       - Include directory names when searching for matches. The 
+                    default is only to look at the file name. (short: -i)
+-nostats          - Don't show the search statistics at the end. Useful when
+                    you just want the list of matching files. (short: -ns)
+-path &lt;directory&gt; - The directory tree to search. The default is the current
+                    directory. (short: -p)
+pattern*          - The patterns/files to search for. Specify as many patterns
+                    as you want separated by spaces. Enclose patterns/files in
+                    quotes to use spaces in the pattern or name.
+                    
+Examples:
+- Search the current directory tree for all .CMD files
+     ff *.cmd
+- Search the Windows directory for all log and txt files
+     ff -p c:\windows *.log *.txt</value>
+  </data>
+  <data name="TotalDirectoriesFmt" xml:space="preserve">
+    <value>Total directories processed : {0}</value>
+  </data>
+  <data name="TotalFilesFmt" xml:space="preserve">
+    <value>Total files processed       : {0}</value>
+  </data>
+  <data name="TotalMatchesFmt" xml:space="preserve">
+    <value>Total matches               : {0}</value>
+  </data>
+  <data name="TotalTimeFmt" xml:space="preserve">
+    <value>Total execution time        : {0}ms</value>
+  </data>
+  <data name="InvalidRegExFmt" xml:space="preserve">
+    <value>"Invalid regular expression: '{0}' Error : {1}"</value>
+  </data>
+</root>

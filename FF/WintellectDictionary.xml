@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Dictionary>
+  <Words>
+    <Unrecognized>
+    </Unrecognized>
+    <Recognized>
+      <Word>Wintellect</Word>
+      <Word>ff</Word>
+      <Word>includedir</Word>
+      <Word>wintellect</Word>
+      <Word>Arg</Word>
+      <Word>nostats</Word>
+      <Word>ms</Word>
+    </Recognized>
+    <Deprecated>
+    </Deprecated>
+    <Compound>
+    </Compound>
+    <DiscreteExceptions>
+      <Term>UseRegEx</Term>
+    </DiscreteExceptions>
+  </Words>
+  <Acronyms>
+    <CasingExceptions>
+      <Word>WiX</Word>
+    </CasingExceptions>
+  </Acronyms>
+</Dictionary>
