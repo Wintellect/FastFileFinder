@@ -7,12 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Concurrent;
+
 namespace FastFind
 {
     using System;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -41,6 +44,8 @@ namespace FastFind
         /// </summary>
         private static int totalDirectories;
 
+        private static readonly BlockingCollection<String> ResultsQueue = new BlockingCollection<string>();
+
         /// <summary>
         /// The entry point function for the program.
         /// </summary>
@@ -67,10 +72,17 @@ namespace FastFind
             totalFiles = 0;
             totalDirectories = 0;
 
+            var canceller = new CancellationTokenSource();
+
             if (parsed)
             {
                 var task = Task.Factory.StartNew(() => RecurseFiles(Options.Path));
+                var resultsTask = Task.Factory.StartNew(() => WriteResultsBatched(canceller.Token, 100));
                 task.Wait();
+
+                canceller.Cancel();
+                resultsTask.Wait();
+
                 timer.Stop();
 
                 if (false == Options.NoStatistics)
@@ -87,6 +99,54 @@ namespace FastFind
             }
 
             return returnValue;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        private static void WriteResults()
+        {
+            foreach (var result in ResultsQueue)
+            {
+                Console.WriteLine(result);
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        private static void WriteResultsBatched(CancellationToken canceller, Int32 batchSize = 10)
+        {
+            var sb = new StringBuilder();
+            var lineCount = 0;
+
+            try
+            {
+                foreach (var line in ResultsQueue.GetConsumingEnumerable(canceller))
+                {
+                    sb.AppendLine(line);
+
+                    if (++lineCount > batchSize)
+                    {
+                        Console.Write(sb);
+                        sb.Clear();
+                        lineCount = 0;
+                    }
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                //Not much to do here...  
+            }
+            finally
+            {
+                if (sb.Length > 0)
+                {
+                    Console.Write(sb);
+                }
+            }
+        }
+
+        private static void QueueConsoleWriteLine(string line)
+        {
+            //Console.WriteLine(line);
+            ResultsQueue.Add(line);
         }
 
         /// <summary>
@@ -181,44 +241,46 @@ namespace FastFind
         {
             try
             {
-                String[] files = Directory.GetFiles(directory);
+                var files = Directory.EnumerateFiles(directory);
+                
+                Parallel.ForEach(files,
+                                 file =>
+                                     {
+                                         Interlocked.Increment(ref totalFiles);
+                                         var currFile = file;
+                                         if (false == Options.IncludeDirectories)
+                                         {
+                                             currFile = Path.GetFileName(currFile);
+                                         }
 
-                Interlocked.Add(ref totalFiles, files.Length);
-
-                for (int i = 0; i < files.Length; i++)
-                {
-                    String currFile = files[i];
-                    if (false == Options.IncludeDirectories)
-                    {
-                        currFile = Path.GetFileName(currFile);
-                    }
-
-                    if (IsNameMatch(currFile))
-                    {
-                        Interlocked.Increment(ref totalMatches);
-                        Console.WriteLine(files[i]);
-                    }
-                }
-
+                                         if (IsNameMatch(currFile))
+                                         {
+                                             Interlocked.Increment(ref totalMatches);
+                                             QueueConsoleWriteLine(file);
+                                         }
+                                     });
+                
                 // Lets look for the directories.
-                String[] dirs = Directory.GetDirectories(directory);
-                Interlocked.Add(ref totalDirectories, dirs.Length);
+                var dirs = Directory.EnumerateDirectories(directory);
 
-                for (int i = 0; i < dirs.Length; i++)
-                {
-                    String currDir = dirs[i];
-                    if (Options.IncludeDirectories)
-                    {
-                        if (IsNameMatch(currDir))
-                        {
-                            Interlocked.Increment(ref totalMatches);
-                            Console.WriteLine(currDir);
-                        }
-                    }
+                Parallel.ForEach(dirs,
+                                 dir =>
+                                     {
+                                         var curDir = dir;
 
-                    // Recurse our way to happiness....
-                    Task.Factory.StartNew(() => RecurseFiles(currDir), TaskCreationOptions.AttachedToParent);
-                }
+                                         Interlocked.Increment(ref totalDirectories);
+
+                                         if (Options.IncludeDirectories)
+                                         {
+                                             if (IsNameMatch(curDir))
+                                             {
+                                                 Interlocked.Increment(ref totalMatches);
+                                                 QueueConsoleWriteLine(curDir);
+                                             }
+                                         }
+
+                                         RecurseFiles(curDir);
+                                     });
             }
             catch (UnauthorizedAccessException)
             {
