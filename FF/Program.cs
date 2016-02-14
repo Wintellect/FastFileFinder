@@ -226,6 +226,12 @@ namespace FastFind
                 // the caller doesn't have access to but it seems like overkill
                 // and noise.
             }
+            catch (PathTooLongException)
+            {
+                // Not much I can do here. The BCL methods do not support the \\?\c:\ format
+                // like the raw Win32 API. I guess I could thunk down and do this on my own by
+                // pInvoke.
+            }
         }
     }
 }

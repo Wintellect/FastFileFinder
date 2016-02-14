@@ -287,7 +287,8 @@ namespace FastFind
         /// </returns>
         private SwitchStatus TestPath(String pathToTest)
         {
-            SwitchStatus ss = SwitchStatus.Error;
+            // Assume good.
+            SwitchStatus ss = SwitchStatus.NoError;
             if (false == String.IsNullOrEmpty(this.Path))
             {
                 this.errorMessage = Constants.PathMultipleSwitches;
