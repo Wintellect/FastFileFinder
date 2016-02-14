@@ -119,7 +119,7 @@ namespace FastFind
 #endif
             if ((null == flagSymbols) || (0 == flagSymbols.Length))
             {
-                throw new ArgumentException(Constants.ArrayMustBeValid, "flagSymbols");
+                throw new ArgumentException(Constants.ArrayMustBeValid, nameof(flagSymbols));
             }
 
             Debug.Assert(null != switchChars, "null != switchChars");
@@ -133,7 +133,7 @@ namespace FastFind
 #endif
             if ((null == switchChars) || (0 == switchChars.Length))
             {
-                throw new ArgumentException(Constants.ArrayMustBeValid, "switchChars");
+                throw new ArgumentException(Constants.ArrayMustBeValid, nameof(switchChars));
             }
 
             this.flagSymbols = flagSymbols;
@@ -331,10 +331,7 @@ namespace FastFind
         /// Every derived class must implement an OnSwitch method or a switch 
         /// is considered an error.
         /// </remarks>
-        protected virtual SwitchStatus OnSwitch(String switchSymbol, String switchValue)
-        {
-            return SwitchStatus.Error;
-        }
+        protected virtual SwitchStatus OnSwitch(String switchSymbol, String switchValue) => SwitchStatus.Error;
 
         /// <summary>
         /// Called when a non-switch value is parsed out.
@@ -345,10 +342,7 @@ namespace FastFind
         /// <returns>
         /// One of the <see cref="SwitchStatus"/> values.
         /// </returns>
-        protected virtual SwitchStatus OnNonSwitch(String value)
-        {
-            return SwitchStatus.Error;
-        }
+        protected virtual SwitchStatus OnNonSwitch(String value) => SwitchStatus.Error;
 
         /// <summary>
         /// Called when parsing is finished so final sanity checking can be 
@@ -357,11 +351,8 @@ namespace FastFind
         /// <returns>
         /// One of the <see cref="SwitchStatus"/> values.
         /// </returns>
-        protected virtual SwitchStatus OnDoneParse()
-        {
-            // By default, we'll assume that all parsing was an error.
-            return SwitchStatus.Error;
-        }
+        // By default, we'll assume that all parsing was an error.
+        protected virtual SwitchStatus OnDoneParse() => SwitchStatus.Error;
 
         /// <summary>
         /// Looks to see if the switch is in the array.

@@ -123,7 +123,7 @@ namespace FastFind
         /// <summary>
         /// Gets the patterns to search for.
         /// </summary>
-        public List<Regex> Patterns { get; private set; }
+        public List<Regex> Patterns { get; }
 
         /// <summary>
         /// Reports correct command line usage.
