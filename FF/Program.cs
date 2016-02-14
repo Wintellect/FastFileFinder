@@ -29,17 +29,17 @@ namespace FastFind
         /// <summary>
         /// The total number of matching files and directories.
         /// </summary>
-        private static int totalMatches;
+        private static Int64 totalMatches;
 
         /// <summary>
         /// The total number of files looked at.
         /// </summary>
-        private static int totalFiles;
+        private static Int64 totalFiles;
 
         /// <summary>
         /// The total number of directories looked at.
         /// </summary>
-        private static int totalDirectories;
+        private static Int64 totalDirectories;
 
         /// <summary>
         /// The entry point function for the program.
@@ -51,9 +51,9 @@ namespace FastFind
         /// 0 - Proper execution
         /// 1 - Invalid command line.
         /// </returns>
-        internal static int Main(string[] args)
+        internal static Int32 Main(String[] args)
         {
-            int returnValue = 0;
+            Int32 returnValue = 0;
 
             Stopwatch timer = new Stopwatch();
 
@@ -98,7 +98,7 @@ namespace FastFind
         /// <param name="args">
         /// Any additional items to include in the output.
         /// </param>
-        internal static void WriteError(string message, params Object[] args)
+        internal static void WriteError(String message, params Object[] args)
         {
             ColorWriteLine(ConsoleColor.Red, message, args);
         }
@@ -109,7 +109,7 @@ namespace FastFind
         /// <param name="message">
         /// The message to write.
         /// </param>
-        internal static void WriteError(string message)
+        internal static void WriteError(String message)
         {
             ColorWriteLine(ConsoleColor.Red, message, null);
         }
@@ -160,7 +160,7 @@ namespace FastFind
         /// </returns>
         private static Boolean IsNameMatch(String name)
         {
-            for (int i = 0; i < Options.Patterns.Count; i++)
+            for (Int32 i = 0; i < Options.Patterns.Count; i++)
             {
                 if (Options.Patterns[i].IsMatch(name))
                 {
@@ -185,7 +185,7 @@ namespace FastFind
 
                 Interlocked.Add(ref totalFiles, files.Length);
 
-                for (int i = 0; i < files.Length; i++)
+                for (Int32 i = 0; i < files.Length; i++)
                 {
                     String currFile = files[i];
                     if (false == Options.IncludeDirectories)
@@ -204,7 +204,7 @@ namespace FastFind
                 String[] dirs = Directory.GetDirectories(directory);
                 Interlocked.Add(ref totalDirectories, dirs.Length);
 
-                for (int i = 0; i < dirs.Length; i++)
+                for (Int32 i = 0; i < dirs.Length; i++)
                 {
                     String currDir = dirs[i];
                     if (Options.IncludeDirectories)

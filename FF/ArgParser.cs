@@ -199,9 +199,8 @@ namespace FastFind
             {
                 ss = SwitchStatus.ShowUsage;
             }
-
-            int errorArg = -1;
-            int currArg;
+            Int32 errorArg = -1;
+            Int32 currArg;
             for (currArg = 0;
                  (ss == SwitchStatus.NoError) && (currArg < args.Length);
                  currArg++)
@@ -218,9 +217,7 @@ namespace FastFind
 
                     // Get the argument itself.
                     String processedArg = args[currArg].Substring(1);
-
-                    // The index into the symbol array. 
-                    int n = this.IsSwitchInArray(this.flagSymbols, processedArg);
+                    Int32 n = this.IsSwitchInArray(this.flagSymbols, processedArg);
 
                     // If it's not in the flags array, try the data array if 
                     // that array is not null.
@@ -366,17 +363,16 @@ namespace FastFind
         /// <returns>
         /// The index of the switch.
         /// </returns>
-        private int IsSwitchInArray(String[] switchArray, String value)
+        private Int32 IsSwitchInArray(String[] switchArray, String value)
         {
             String valueCompare = value;
             if (this.caseSensitiveSwitches)
             {
                 valueCompare = value.ToUpperInvariant();
             }
+            Int32 retValue = -1;
 
-            int retValue = -1;
-
-            for (int n = 0; n < switchArray.Length; n++)
+            for (Int32 n = 0; n < switchArray.Length; n++)
             {
                 String currSwitch = switchArray[n];
                 if (this.caseSensitiveSwitches)
@@ -406,7 +402,7 @@ namespace FastFind
         private Boolean StartsWithSwitchChar(String value)
         {
             Boolean isSwitch = false;
-            for (int n = 0; !isSwitch && (n < this.switchChars.Length); n++)
+            for (Int32 n = 0; !isSwitch && (n < this.switchChars.Length); n++)
             {
                 if (0 != String.CompareOrdinal(value, 0, this.switchChars[n], 0, 1))
                 {

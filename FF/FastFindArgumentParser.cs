@@ -12,6 +12,7 @@ namespace FastFind
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -19,57 +20,57 @@ namespace FastFind
     /// <summary>
     /// Implements the command line parsing for the Fast Find program.
     /// </summary>
-    internal class FastFindArgumentParser : ArgParser
+    internal sealed class FastFindArgumentParser : ArgParser
     {
         /// <summary>
         /// The path flag.
         /// </summary>
-        private const string PathFlag = "path";
+        private const String PathFlag = "path";
 
         /// <summary>
         /// The path flag short.
         /// </summary>
-        private const string PathFlagShort = "p";
+        private const String PathFlagShort = "p";
 
         /// <summary>
         /// The use regular expressions flag.
         /// </summary>
-        private const string RegExFlag = "regex";
+        private const String RegExFlag = "regex";
 
         /// <summary>
         /// The short use regular expressions flag.
         /// </summary>
-        private const string RegExFlagShort = "re";
+        private const String RegExFlagShort = "re";
 
         /// <summary>
         /// The only files flag.
         /// </summary>
-        private const string IncludeDirectoryName = "includedir";
+        private const String IncludeDirectoryName = "includedir";
 
         /// <summary>
         /// The short only files flag short.
         /// </summary>
-        private const string IncludeDirectoryNameShort = "i";
+        private const String IncludeDirectoryNameShort = "i";
 
         /// <summary>
         /// The no statistics flag.
         /// </summary>
-        private const string NoStats = "nostats";
+        private const String NoStats = "nostats";
 
         /// <summary>
         /// The short no stats flag.
         /// </summary>
-        private const string NoStatsShort = "ns";
+        private const String NoStatsShort = "ns";
 
         /// <summary>
         /// The help flag.
         /// </summary>
-        private const string HelpFlag = "help";
+        private const String HelpFlag = "help";
 
         /// <summary>
         /// The short help flag.
         /// </summary>
-        private const string HelpFlagShort = "?";
+        private const String HelpFlagShort = "?";
 
         /// <summary>
         /// The raw patterns as they come in from the command line.
@@ -131,7 +132,7 @@ namespace FastFind
         /// <param name="errorInfo">
         /// The string with the invalid command line option.
         /// </param>
-        public override void OnUsage(string errorInfo)
+        public override void OnUsage(String errorInfo)
         {
             ProcessModule exe = Process.GetCurrentProcess().Modules[0];
             Console.WriteLine(Constants.UsageString, exe.FileVersionInfo.FileVersion);
@@ -159,7 +160,7 @@ namespace FastFind
         /// <returns>
         /// One of the <see cref="ArgParser.SwitchStatus"/> values.
         /// </returns>
-        protected override SwitchStatus OnSwitch(string switchSymbol, string switchValue)
+        protected override SwitchStatus OnSwitch(String switchSymbol, String switchValue)
         {
             SwitchStatus ss = SwitchStatus.NoError;
 
@@ -167,24 +168,7 @@ namespace FastFind
             {
                 case PathFlag:
                 case PathFlagShort:
-                    if (false == String.IsNullOrEmpty(this.Path))
-                    {
-                        this.errorMessage = Constants.PathMultipleSwitches;
-                        ss = SwitchStatus.Error;
-                    }
-                    else
-                    {
-                        if (Directory.Exists(switchValue))
-                        {
-                            this.Path = switchValue;
-                        }
-                        else
-                        {
-                            this.errorMessage = Constants.PathNotExist;
-                            ss = SwitchStatus.Error;
-                        }
-                    }
-
+                    ss = TestPath(switchValue);
                     break;
 
                 case RegExFlag:
@@ -225,7 +209,7 @@ namespace FastFind
         /// <returns>
         /// One of the <see cref="ArgParser.SwitchStatus"/> values.
         /// </returns>
-        protected override SwitchStatus OnNonSwitch(string value)
+        protected override SwitchStatus OnNonSwitch(String value)
         {
             // Just add this to the list of patterns to search for.
             this.rawPatterns.Add(value);
@@ -257,7 +241,7 @@ namespace FastFind
             else
             {
                 // Convert all the raw patterns into regular expressions.
-                for (int i = 0; i < this.rawPatterns.Count; i++)
+                for (Int32 i = 0; i < this.rawPatterns.Count; i++)
                 {
                     String thePattern = this.rawPatterns[i];
                     if (false == this.useRegEx)
@@ -278,7 +262,10 @@ namespace FastFind
                         // when the user specified the -regex switch and they
                         // used a DOS wildcard pattern like *..
                         StringBuilder sb = new StringBuilder();
-                        sb.AppendFormat(Constants.InvalidRegExFmt, thePattern, e.Message);
+                        sb.AppendFormat(CultureInfo.CurrentCulture, 
+                                        Constants.InvalidRegExFmt, 
+                                        thePattern, 
+                                        e.Message);
                         this.errorMessage = sb.ToString();
                         ss = SwitchStatus.Error;
                         break;
@@ -288,5 +275,39 @@ namespace FastFind
 
             return ss;
         }
+
+        /// <summary>
+        /// Isolates the checking for the path parameter.
+        /// </summary>
+        /// <param name="pathToTest">
+        /// The path value to test.
+        /// </param>
+        /// <returns>
+        /// A valid <see cref="SwitchStatus"/> value.
+        /// </returns>
+        private SwitchStatus TestPath(String pathToTest)
+        {
+            SwitchStatus ss = SwitchStatus.Error;
+            if (false == String.IsNullOrEmpty(this.Path))
+            {
+                this.errorMessage = Constants.PathMultipleSwitches;
+                ss = SwitchStatus.Error;
+            }
+            else
+            {
+                if (Directory.Exists(pathToTest))
+                {
+                    this.Path = pathToTest;
+                }
+                else
+                {
+                    this.errorMessage = Constants.PathNotExist;
+                    ss = SwitchStatus.Error;
+                }
+            }
+
+            return ss;
+        }
+
     }
 }
