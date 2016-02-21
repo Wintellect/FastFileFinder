@@ -133,7 +133,7 @@
     <value>Only one -path switch at a time may be used.</value>
   </data>
   <data name="PathNotExist" xml:space="preserve">
-    <value>The path directory does not exist.</value>
+    <value>The path directory does not exist or ends in '\' which Windows command line parsing does not like.</value>
   </data>
   <data name="UnknownCommandLineOption" xml:space="preserve">
     <value>Unknown command line option.</value>

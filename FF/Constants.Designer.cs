@@ -115,7 +115,7 @@ namespace FastFind {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The path directory does not exist..
+        ///   Looks up a localized string similar to The path directory does not exist or ends in &apos;\&apos; which Windows command line parsing does not like..
         /// </summary>
         internal static string PathNotExist {
             get {
