@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FastFindArgumentParser.cs" company="John Robbins/Wintellect">
-//   (c) 2012 by John Robbins/Wintellect
+//   (c) 2012-2016 by John Robbins/Wintellect
 // </copyright>
 // <summary>
 //   The fast file finder program.
@@ -309,6 +309,5 @@ namespace FastFind
 
             return ss;
         }
-
     }
 }

@@ -170,7 +170,7 @@ namespace FastFind {
         
         /// <summary>
         ///   Looks up a localized string similar to FF {0}
-        ///(c) 2012, John Robbins/Wintellect - john@wintellect.com
+        ///(c) 2016, John Robbins/Wintellect - john@wintellect.com
         ///Find file and directory names fast!
         ///
         ///Usage: 
