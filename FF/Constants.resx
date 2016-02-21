@@ -154,8 +154,9 @@ FF [-regex] [-includedir] [-nostats] [-path &lt;directory&gt;] pattern*
 -nostats          - Don't show the search statistics at the end. Useful when
                     you just want the list of matching files. (short: -ns)
 -path &lt;directory&gt; - The directory tree to search. The default is the current
-                    directory. (short: -p)
-pattern*          - The patterns/files to search for. Specify as many patterns
+                    directory. Because of command line parsing weakness in 
+                    Windows, don't end the directories with '\' characters
+                    (short: -p)attern*          - The patterns/files to search for. Specify as many patterns
                     as you want separated by spaces. Enclose patterns/files in
                     quotes to use spaces in the pattern or name.
                     
