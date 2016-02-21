@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="John Robbins/Wintellect">
-//   (c) 2012 by John Robbins/Wintellect
+//   (c) 2012-2016 by John Robbins/Wintellect
 // </copyright>
 // <summary>
 //   The fast file finder program.
@@ -10,16 +10,19 @@
 namespace FastFind
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
     /// The entry point to the application.
     /// </summary>
-    internal static class Program
+    internal sealed class Program
     {
         /// <summary>
         /// Holds the command line options the user wanted.
@@ -40,6 +43,11 @@ namespace FastFind
         /// The total number of directories looked at.
         /// </summary>
         private static Int64 totalDirectories;
+
+        /// <summary>
+        /// The collection to hold found strings so they can be printed in batch mode.
+        /// </summary>
+        private static readonly BlockingCollection<String> ResultsQueue = new BlockingCollection<String>();
 
         /// <summary>
         /// The entry point function for the program.
@@ -69,8 +77,18 @@ namespace FastFind
 
             if (parsed)
             {
+                var canceller = new CancellationTokenSource();
+
+                // Fire up the searcher and batch output threads.
                 var task = Task.Factory.StartNew(() => RecurseFiles(Options.Path));
+                var resultsTask = Task.Factory.StartNew(() => WriteResultsBatched(canceller.Token, 200));
+
                 task.Wait();
+
+                // Indicate a cancel so all remaining strings get printed out.
+                canceller.Cancel();
+                resultsTask.Wait();
+
                 timer.Stop();
 
                 if (false == Options.NoStatistics)
@@ -172,65 +190,138 @@ namespace FastFind
         }
 
         /// <summary>
-        /// Reports all matches in a directory.
+        /// Takes care of writing out results found in a batch manner so slow calls to 
+        /// Console.WriteLine are minimized.
         /// </summary>
-        /// <param name="directory">
-        /// The directory to look at.
+        /// <param name="canceller">
+        /// The cancellation token.
         /// </param>
-        private static void RecurseFiles(String directory)
+        /// <param name="batchSize">
+        /// The batch size for the number of lines to write.
+        /// </param>
+        private static void WriteResultsBatched(CancellationToken canceller, Int32 batchSize = 10)
         {
+            var sb = new StringBuilder(batchSize * 260);
+            var lineCount = 0;
+
             try
             {
-                String[] files = Directory.GetFiles(directory);
-
-                Interlocked.Add(ref totalFiles, files.Length);
-
-                for (Int32 i = 0; i < files.Length; i++)
+                foreach (var line in ResultsQueue.GetConsumingEnumerable(canceller))
                 {
-                    String currFile = files[i];
-                    if (false == Options.IncludeDirectories)
-                    {
-                        currFile = Path.GetFileName(currFile);
-                    }
+                    sb.AppendLine(line);
+                    lineCount++;
 
-                    if (IsNameMatch(currFile))
+                    if (lineCount > batchSize)
                     {
-                        Interlocked.Increment(ref totalMatches);
-                        Console.WriteLine(files[i]);
+                        Console.Write(sb);
+                        sb.Clear();
+                        lineCount = 0;
                     }
                 }
-
-                // Lets look for the directories.
-                String[] dirs = Directory.GetDirectories(directory);
-                Interlocked.Add(ref totalDirectories, dirs.Length);
-
-                for (Int32 i = 0; i < dirs.Length; i++)
+            }
+            catch (OperationCanceledException)
+            {
+                //Not much to do here...  
+            }
+            finally
+            {
+                if (sb.Length > 0)
                 {
-                    String currDir = dirs[i];
-                    if (Options.IncludeDirectories)
+                    Console.Write(sb);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The method to call when a matching file/directory is found.
+        /// </summary>
+        /// <param name="line">
+        /// The matching item to add to the output queue.
+        /// </param>
+        private static void QueueConsoleWriteLine(String line)
+        {
+            ResultsQueue.Add(line);
+        }
+
+
+        /// <summary>
+        /// The main method that does the recursive file matching. 
+        /// </summary>
+        /// <param name="directory">
+        /// The file directory to search.
+        /// </param>
+        /// <remarks>
+        /// This method calls the low level Windows API because the built in .NET APIs do not
+        /// support long file names. (Those greater than 260 characters).
+        /// </remarks>
+        static private void RecurseFiles(String directory)
+        {
+            String lookUpdirectory = "\\\\?\\" + directory + "\\*";
+            NativeMethods.WIN32_FIND_DATA w32FindData;
+
+            using (SafeFindFileHandle fileHandle = NativeMethods.FindFirstFileEx(lookUpdirectory,
+                                                                                 NativeMethods.FINDEX_INFO_LEVELS.Basic,
+                                                                                 out w32FindData,
+                                                                                 NativeMethods.FINDEX_SEARCH_OPS.SearchNameMatch,
+                                                                                 IntPtr.Zero,
+                                                                                 NativeMethods.FindExAdditionalFlags.LargeFetch))
+            {
+                if (!fileHandle.IsInvalid)
+                {
+                    do
                     {
-                        if (IsNameMatch(currDir))
+                        // Does this match "." or ".."? If so get out.
+                        if ((w32FindData.cFileName.Equals(".", StringComparison.OrdinalIgnoreCase) ||
+                            (w32FindData.cFileName.Equals("..", StringComparison.OrdinalIgnoreCase))))
                         {
-                            Interlocked.Increment(ref totalMatches);
-                            Console.WriteLine(currDir);
+                            continue;
                         }
-                    }
 
-                    // Recurse our way to happiness....
-                    Task.Factory.StartNew(() => RecurseFiles(currDir), TaskCreationOptions.AttachedToParent);
+                        // Is this a directory? If so, queue up another task.
+                        if ((w32FindData.dwFileAttributes & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            Interlocked.Increment(ref totalDirectories);
+
+                            String subDirectory = directory + "\\" + w32FindData.cFileName;
+                            if (Options.IncludeDirectories)
+                            {
+                                if (IsNameMatch(subDirectory))
+                                {
+                                    Interlocked.Increment(ref totalMatches);
+                                    QueueConsoleWriteLine(subDirectory);
+                                }
+                            }
+
+                            // Recurse our way to happiness....
+                            Task.Factory.StartNew(() => RecurseFiles(subDirectory), TaskCreationOptions.AttachedToParent);
+                        }
+                        else
+                        {
+                            // It's a file so look at it.
+                            Interlocked.Increment(ref totalFiles);
+
+                            String fullFile = directory;
+                            if (!directory.EndsWith("\\", StringComparison.OrdinalIgnoreCase))
+                            {
+                                fullFile += "\\";
+                            }
+                            fullFile += w32FindData.cFileName;
+
+                            String matchName = fullFile;
+
+                            if (false == Options.IncludeDirectories)
+                            {
+                                matchName = w32FindData.cFileName;
+                            }
+
+                            if (IsNameMatch(matchName))
+                            {
+                                Interlocked.Increment(ref totalMatches);
+                                QueueConsoleWriteLine(fullFile);
+                            }
+                        }
+                    } while (NativeMethods.FindNextFile(fileHandle, out w32FindData));
                 }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // I guess I could dump out the fact that there was a directory
-                // the caller doesn't have access to but it seems like overkill
-                // and noise.
-            }
-            catch (PathTooLongException)
-            {
-                // Not much I can do here. The BCL methods do not support the \\?\c:\ format
-                // like the raw Win32 API. I guess I could thunk down and do this on my own by
-                // pInvoke.
             }
         }
     }
