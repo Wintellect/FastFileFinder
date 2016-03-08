@@ -182,4 +182,10 @@ Examples:
   <data name="InvalidRegExFmt" xml:space="preserve">
     <value>"Invalid regular expression: '{0}' Error : {1}"</value>
   </data>
+  <data name="TotalMatchesSizeFmt" xml:space="preserve">
+    <value>Total matches size          : {0} bytes</value>
+  </data>
+  <data name="TotalSizeFmt" xml:space="preserve">
+    <value>Total size                  : {0} bytes</value>
+  </data>
 </root>
