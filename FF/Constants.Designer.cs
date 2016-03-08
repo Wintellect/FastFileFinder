@@ -151,6 +151,24 @@ namespace FastFind {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Total matches size          : {0} bytes.
+        /// </summary>
+        internal static string TotalMatchesSizeFmt {
+            get {
+                return ResourceManager.GetString("TotalMatchesSizeFmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total size                  : {0} bytes.
+        /// </summary>
+        internal static string TotalSizeFmt {
+            get {
+                return ResourceManager.GetString("TotalSizeFmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Total execution time        : {0}ms.
         /// </summary>
         internal static string TotalTimeFmt {

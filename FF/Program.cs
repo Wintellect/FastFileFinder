@@ -35,6 +35,11 @@ namespace FastFind
         private static Int64 totalMatches;
 
         /// <summary>
+        /// The total number of bytes the matching file consume.
+        /// </summary>
+        private static Int64 totalMatchesSize;
+
+        /// <summary>
         /// The total number of files looked at.
         /// </summary>
         private static Int64 totalFiles;
@@ -43,6 +48,11 @@ namespace FastFind
         /// The total number of directories looked at.
         /// </summary>
         private static Int64 totalDirectories;
+
+        /// <summary>
+        /// The total number of bytes the files looked at consume.
+        /// </summary>
+        private static Int64 totalSize;
 
         /// <summary>
         /// The collection to hold found strings so they can be printed in batch mode.
@@ -72,8 +82,10 @@ namespace FastFind
             Boolean parsed = Options.Parse(args);
 
             totalMatches = 0;
+            totalMatchesSize = 0;
             totalFiles = 0;
             totalDirectories = 0;
+            totalSize = 0;
 
             if (parsed)
             {
@@ -96,9 +108,11 @@ namespace FastFind
                     Console.WriteLine(Constants.TotalTimeFmt, timer.ElapsedMilliseconds.ToString("N0", CultureInfo.CurrentCulture));
                     Console.WriteLine(Constants.TotalFilesFmt, totalFiles.ToString("N0", CultureInfo.CurrentCulture));
                     Console.WriteLine(Constants.TotalDirectoriesFmt, totalDirectories.ToString("N0", CultureInfo.CurrentCulture));
+                    Console.WriteLine(Constants.TotalSizeFmt, totalSize.ToString("N0", CultureInfo.CurrentCulture));
                     Console.WriteLine(Constants.TotalMatchesFmt, totalMatches.ToString("N0", CultureInfo.CurrentCulture));
+                    Console.WriteLine(Constants.TotalMatchesSizeFmt, totalMatchesSize.ToString("N0", CultureInfo.CurrentCulture));
                 }
-            }
+              }
             else
             {
                 returnValue = 1;
@@ -256,7 +270,15 @@ namespace FastFind
         /// </remarks>
         static private void RecurseFiles(String directory)
         {
-            String lookUpdirectory = "\\\\?\\" + directory + "\\*";
+            String lookUpdirectory = String.Empty;
+            if (directory.StartsWith(@"\\", StringComparison.OrdinalIgnoreCase))
+            {
+              lookUpdirectory += directory.Replace(@"\\", @"\\?\UNC\") + "\\*";
+            }
+            else
+            {
+              lookUpdirectory = "\\\\?\\" + directory + "\\*";
+            }
             NativeMethods.WIN32_FIND_DATA w32FindData;
 
             using (SafeFindFileHandle fileHandle = NativeMethods.FindFirstFileEx(lookUpdirectory,
@@ -297,8 +319,11 @@ namespace FastFind
                         }
                         else
                         {
-                            // It's a file so look at it.
+                          // It's a file so look at it.
                             Interlocked.Increment(ref totalFiles);
+
+                            Int64 fileSize = w32FindData.nFileSizeLow + ((Int64)w32FindData.nFileSizeHigh << 32);
+                            Interlocked.Add(ref totalSize, fileSize);
 
                             String fullFile = directory;
                             if (!directory.EndsWith("\\", StringComparison.OrdinalIgnoreCase))
@@ -317,6 +342,7 @@ namespace FastFind
                             if (IsNameMatch(matchName))
                             {
                                 Interlocked.Increment(ref totalMatches);
+                                Interlocked.Add(ref totalMatchesSize, fileSize);
                                 QueueConsoleWriteLine(fullFile);
                             }
                         }
