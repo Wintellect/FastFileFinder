@@ -112,7 +112,7 @@ namespace FastFind
                     Console.WriteLine(Constants.TotalMatchesFmt, totalMatches.ToString("N0", CultureInfo.CurrentCulture));
                     Console.WriteLine(Constants.TotalMatchesSizeFmt, totalMatchesSize.ToString("N0", CultureInfo.CurrentCulture));
                 }
-              }
+            }
             else
             {
                 returnValue = 1;
@@ -273,11 +273,11 @@ namespace FastFind
             String lookUpdirectory = String.Empty;
             if (directory.StartsWith(@"\\", StringComparison.OrdinalIgnoreCase))
             {
-              lookUpdirectory += directory.Replace(@"\\", @"\\?\UNC\") + "\\*";
+                lookUpdirectory += directory.Replace(@"\\", @"\\?\UNC\") + "\\*";
             }
             else
             {
-              lookUpdirectory = "\\\\?\\" + directory + "\\*";
+                lookUpdirectory = "\\\\?\\" + directory + "\\*";
             }
             NativeMethods.WIN32_FIND_DATA w32FindData;
 
@@ -304,7 +304,7 @@ namespace FastFind
                         {
                             Interlocked.Increment(ref totalDirectories);
 
-                            String subDirectory = directory + "\\" + w32FindData.cFileName;
+                            String subDirectory = Path.Combine(directory, w32FindData.cFileName);
                             if (Options.IncludeDirectories)
                             {
                                 if (IsNameMatch(subDirectory))
@@ -319,7 +319,7 @@ namespace FastFind
                         }
                         else
                         {
-                          // It's a file so look at it.
+                            // It's a file so look at it.
                             Interlocked.Increment(ref totalFiles);
 
                             Int64 fileSize = w32FindData.nFileSizeLow + ((Int64)w32FindData.nFileSizeHigh << 32);
