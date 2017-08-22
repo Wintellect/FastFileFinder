@@ -307,7 +307,7 @@ namespace FastFind
                             String subDirectory = Path.Combine(directory, w32FindData.cFileName);
                             if (Options.IncludeDirectories)
                             {
-                                if (IsNameMatch(subDirectory))
+                                if (IsNameMatch(w32FindData.cFileName))
                                 {
                                     Interlocked.Increment(ref totalMatches);
                                     QueueConsoleWriteLine(subDirectory);
